@@ -277,8 +277,6 @@ class MainActivity : AppCompatActivity() {
                     // Добавляем новое напоминание
                     reminders.add(Reminder(text))
                     saveReminders() // Сохраняем напоминания
-                    reminders.add(Reminder(text))
-                    saveReminders()
                     updateRemindersView()
 
                     // Уведомляем адаптер

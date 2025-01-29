@@ -16,7 +16,6 @@ class RemindersAdapter(
     private val onDeleteClick: (Int) -> Unit
 ) : RecyclerView.Adapter<RemindersAdapter.ReminderViewHolder>() {
 
-    // ViewHolder для отображения элемента напоминания
     class ReminderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val reminderTextView: TextView = itemView.findViewById(R.id.reminderTextView)
         val completeButton: Button = itemView.findViewById(R.id.completeReminderButton)
@@ -27,12 +26,12 @@ class RemindersAdapter(
         return ReminderViewHolder(view)
     }
 
-    // Обновление данных в адаптере
     fun updateData(newReminders: List<Reminder>) {
         reminders.clear()
         reminders.addAll(newReminders)
         notifyDataSetChanged()
     }
+
 
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         val reminder = reminders[position]
@@ -42,11 +41,8 @@ class RemindersAdapter(
 
         // Зачёркиваем текст, если напоминание выполнено
         holder.reminderTextView.paintFlags =
-            if (reminder.isCompleted) {
-                holder.reminderTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            } else {
-                holder.reminderTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-            }
+            if (reminder.isCompleted) holder.reminderTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            else holder.reminderTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
 
         // Обновляем кнопку (○ или ✔)
         holder.completeButton.text = if (reminder.isCompleted) "☑" else "☐"
@@ -59,19 +55,21 @@ class RemindersAdapter(
             val currentTime = System.currentTimeMillis()
             if (currentTime - lastClickTime < doubleTapTimeout) {
                 // Двойной тап: удаление
-                if (holder.adapterPosition != RecyclerView.NO_POSITION) {
-                    onDeleteClick(holder.adapterPosition)
+                val actualPosition = holder.adapterPosition
+                if (actualPosition != RecyclerView.NO_POSITION) {
+                    onDeleteClick(actualPosition)
                 }
             } else {
                 // Одиночный тап: завершение напоминания
-                if (holder.adapterPosition != RecyclerView.NO_POSITION) {
-                    onCompleteClick(holder.adapterPosition)
+                val actualPosition = holder.adapterPosition
+                if (actualPosition != RecyclerView.NO_POSITION) {
+                    onCompleteClick(actualPosition)
                 }
             }
             lastClickTime = currentTime
         }
     }
 
+
     override fun getItemCount(): Int = reminders.size
 }
-
