@@ -7,23 +7,22 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AlertDialog
-import com.example.assistant.SettingsAdapter
 import androidx.cardview.widget.CardView
 import android.view.View
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.widget.TextView
 
 
-
-
-//теперь блок увеличивается через раз, но только если нажать на кнопку какого нибудь напоминания. Мне кажется нужно добавить обновление блока после добавления напоминания
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var addNoteButton: Button
     private lateinit var addHabitButton: Button
-    private lateinit var settingsButton: Button
+    private lateinit var settingsButton: ImageButton
     private lateinit var addReminderButton: Button
     private lateinit var notesRecyclerView: RecyclerView
     private lateinit var habitsRecyclerView: RecyclerView
@@ -32,6 +31,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var habitsAdapter: HabitsAdapter
     private lateinit var settingsAdapter: SettingsAdapter
     private lateinit var remindersAdapter: RemindersAdapter
+    private lateinit var dialogAllRemAdapter: RemindersAdapter
+//    private lateinit var dialogRemView: androidx.constraintlayout.widget.ConstraintLayout
+
+
 
     private val sharedPreferences by lazy {
         getSharedPreferences("NotesApp", Context.MODE_PRIVATE)
@@ -41,12 +44,69 @@ class MainActivity : AppCompatActivity() {
     private val habits = mutableListOf<Habit>()
     private val reminders = mutableListOf<Reminder>()
     private var visibleRemindersCount = 4
+    private lateinit var showMoreButton: Button // Добавляем поле
+
+    private val adviceList = listOf(
+        "Ставьте четкие цели на день, неделю и месяц.",
+        "Используйте метод Pomodoro: 25 минут работы, 5 минут отдыха.",
+        "Начинайте день с самых важных задач.",
+        "Планируйте день заранее, лучше с вечера.",
+        "Не перегружайте список дел — ставьте реалистичные задачи.",
+        "Используйте правило 2 минут: если дело можно сделать за 2 минуты, сделайте сразу.",
+        "Делегируйте задачи, которые могут выполнить другие.",
+        "Разбивайте большие задачи на мелкие шаги.",
+        "Избегайте многозадачности, фокусируйтесь на одном деле.",
+        "Ограничивайте время на каждую задачу, устанавливая таймер.",
+        "Выключайте уведомления во время работы.",
+        "Проверяйте почту и мессенджеры не чаще 2-3 раз в день.",
+        "Используйте чек-листы для повторяющихся задач.",
+        "Проводите ревизию задач раз в неделю.",
+        "Не бойтесь говорить 'нет' ненужным встречам и просьбам.",
+        "Записывайте все задачи, чтобы не держать их в голове.",
+        "Оставляйте буферное время между задачами.",
+        "Используйте цифровые планировщики или бумажные ежедневники.",
+        "Работайте в блоках времени: группируйте похожие задачи.",
+        "Автоматизируйте рутинные процессы.",
+        "Определите свой самый продуктивный период дня и планируйте важные задачи в это время.",
+        "Ставьте дедлайны даже для задач без сроков.",
+        "Следите за уровнем энергии, высыпайтесь и отдыхайте.",
+        "Используйте принцип 80/20: 20% действий дают 80% результата.",
+        "Учитесь быстро принимать решения и не зацикливаться на мелочах.",
+        "Запланируйте время на отдых и перерывы.",
+        "Создайте удобное рабочее место без отвлекающих факторов.",
+        "Не откладывайте неприятные задачи, решайте их сразу.",
+        "Проводите цифровую детоксикацию, ограничивая время в соцсетях.",
+        "Используйте цветовое кодирование задач для приоритизации.",
+        "В конце дня анализируйте, что удалось выполнить.",
+        "Планируйте свободное время так же, как и рабочее.",
+        "Периодически пересматривайте свои цели и планы.",
+        "Отмечайте завершенные задачи, чтобы видеть прогресс.",
+        "Учитесь отказывать от лишних встреч и мероприятий.",
+        "Развивайте самодисциплину и привычку завершать начатое.",
+        "Пишите списки задач коротко и конкретно.",
+        "Ограничьте время на чтение новостей и соцсетей.",
+        "Используйте приложения для учета времени (Toggl, RescueTime).",
+        "Практикуйте утренние ритуалы, чтобы начать день продуктивно.",
+        "Старайтесь заканчивать день в одно и то же время.",
+        "Пересматривайте список дел и удаляйте ненужные задачи.",
+        "Используйте систему 'Must, Should, Want' для приоритизации.",
+        "Не пытайтесь быть идеальным — лучше завершить задачу, чем делать идеально.",
+        "Выделяйте 10-15 минут в день для планирования будущих задач.",
+        "Чередуйте сложные задачи с простыми для баланса.",
+        "Учитесь управлять стрессом и расслабляться.",
+        "Фокусируйтесь на результате, а не на занятости."
+    )
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+            //  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
+        showMoreButton = findViewById(R.id.showMoreRemindersButton)
         addNoteButton = findViewById(R.id.addNoteButton)
         addHabitButton = findViewById(R.id.addHabitButton)
         settingsButton = findViewById(R.id.settingsButton)
@@ -120,6 +180,39 @@ class MainActivity : AppCompatActivity() {
 
         remindersRecyclerView.layoutManager = LinearLayoutManager(this)
         remindersRecyclerView.adapter = remindersAdapter
+
+        updateRemindersView()
+
+
+        showMoreButton.setOnClickListener { showAllRemindersDialog() }
+
+
+        dialogAllRemAdapter = RemindersAdapter(reminders, onCompleteClick = { position ->
+            reminders[position].isCompleted = !reminders[position].isCompleted
+            saveReminders()
+            updateRemindersView()
+            dialogAllRemAdapter.notifyItemChanged(position)
+        }, onDeleteClick = { position ->
+            reminders.removeAt(position)
+            saveReminders()
+            updateRemindersView()
+            updateAllRemindersView()
+        })
+
+
+        val adviceTextView = findViewById<TextView>(R.id.adviceTextView)
+        val newAdviceButton = findViewById<Button>(R.id.newAdviceButton)
+
+
+
+        fun setRandomAdvice() {
+            val randomAdvice = adviceList.random()
+            adviceTextView.text = randomAdvice
+        }
+
+        setRandomAdvice()
+        newAdviceButton.setOnClickListener { setRandomAdvice() }
+
 
 
 
@@ -207,6 +300,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun showAllRemindersDialog(state: Int = 0) {
+        val dialogRemView = layoutInflater.inflate(R.layout.dialog_all_reminders, null)
+        val dialogRecyclerView = dialogRemView.findViewById<RecyclerView>(R.id.dialogRemindersRecyclerView)
+
+        dialogRecyclerView.layoutManager = LinearLayoutManager(this)
+        dialogRecyclerView.adapter = dialogAllRemAdapter
+
+        val bottomSheetDialog = BottomSheetDialog(this)
+        bottomSheetDialog.setContentView(dialogRemView)
+        if (state == 0) {
+        bottomSheetDialog.show() }
+        else {
+            bottomSheetDialog.dismiss()
+        }
+    }
+
+
+    private fun updateAllRemindersView() {
+        val currentVisibleReminders = reminders.take(visibleRemindersCount).toMutableList()
+
+        // Обновляем данные в адаптере
+        dialogAllRemAdapter.updateData(currentVisibleReminders)
+
+        if (reminders.size == 0) {
+            showAllRemindersDialog(1)
+        }
+
+    }
+
+
+
     private fun updateRemindersView() {
         val showMoreButton = findViewById<Button>(R.id.showMoreRemindersButton)
         val currentVisibleReminders = reminders.take(visibleRemindersCount).toMutableList()
@@ -215,7 +340,7 @@ class MainActivity : AppCompatActivity() {
         remindersAdapter.updateData(currentVisibleReminders)
 
         // Показываем или скрываем кнопку "Показать больше"
-        if (visibleRemindersCount < reminders.size) {
+        if (3 < reminders.size) {
             showMoreButton.visibility = View.VISIBLE
         } else {
             showMoreButton.visibility = View.GONE
@@ -224,9 +349,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     private fun showAddNoteDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_note, null)
         val noteEditText = dialogView.findViewById<EditText>(R.id.dialogNoteEditText)
+
 
         AlertDialog.Builder(this)
             .setTitle("Добавить заметку")
@@ -279,7 +406,11 @@ class MainActivity : AppCompatActivity() {
                     saveReminders() // Сохраняем напоминания
                     updateRemindersView()
 
+                    visibleRemindersCount += 1
+
                     // Уведомляем адаптер
+                    remindersAdapter.notifyDataSetChanged()
+
                     remindersAdapter.notifyItemInserted(reminders.size - 1)
 
                     // Обновляем RecyclerView и CardView
