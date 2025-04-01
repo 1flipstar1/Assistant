@@ -13,8 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Привычка"
-        android:textSize="22sp"
-        android:textStyle="bold"
+        android:textSize="18sp"
         android:textColor="@color/black"
         />
 

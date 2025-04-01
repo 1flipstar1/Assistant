@@ -1,5 +1,7 @@
 package com.example.assistant
 
+// Импортирование библиотек
+
 import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -15,10 +17,14 @@ import androidx.cardview.widget.CardView
 import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.TextView
+import android.widget.Toolbar
 
 
+// Запуск основной активити
 
 class MainActivity : AppCompatActivity() {
+
+    // Установка главных глобальных переменных
 
     private lateinit var addNoteButton: Button
     private lateinit var addHabitButton: Button
@@ -32,8 +38,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settingsAdapter: SettingsAdapter
     private lateinit var remindersAdapter: RemindersAdapter
     private lateinit var dialogAllRemAdapter: RemindersAdapter
-//    private lateinit var dialogRemView: androidx.constraintlayout.widget.ConstraintLayout
-
 
 
     private val sharedPreferences by lazy {
@@ -44,7 +48,9 @@ class MainActivity : AppCompatActivity() {
     private val habits = mutableListOf<Habit>()
     private val reminders = mutableListOf<Reminder>()
     private var visibleRemindersCount = 4
-    private lateinit var showMoreButton: Button // Добавляем поле
+    private lateinit var showMoreButton: Button
+
+    // Создание списка с советами по тайменеджменту
 
     private val adviceList = listOf(
         "Ставьте четкие цели на день, неделю и месяц.",
@@ -98,13 +104,14 @@ class MainActivity : AppCompatActivity() {
     )
 
 
+    // Создание основых обработчиков
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-            //  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        actionBar?.hide()
 
         showMoreButton = findViewById(R.id.showMoreRemindersButton)
         addNoteButton = findViewById(R.id.addNoteButton)
@@ -115,7 +122,6 @@ class MainActivity : AppCompatActivity() {
         habitsRecyclerView = findViewById(R.id.habitsRecyclerView)
         remindersRecyclerView = findViewById(R.id.remindersRecyclerView)
 
-        // Инициализация RecyclerView для заметок
         notesRecyclerView.layoutManager = LinearLayoutManager(this)
         val dividerItemDecoration = DividerItemDecoration(notesRecyclerView.context, LinearLayoutManager.VERTICAL)
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider)!!)
@@ -163,7 +169,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
         remindersAdapter = RemindersAdapter(reminders,
             onCompleteClick = { position ->
                 reminders[position].isCompleted = !reminders[position].isCompleted
@@ -204,7 +209,6 @@ class MainActivity : AppCompatActivity() {
         val newAdviceButton = findViewById<Button>(R.id.newAdviceButton)
 
 
-
         fun setRandomAdvice() {
             val randomAdvice = adviceList.random()
             adviceTextView.text = randomAdvice
@@ -214,19 +218,14 @@ class MainActivity : AppCompatActivity() {
         newAdviceButton.setOnClickListener { setRandomAdvice() }
 
 
-
-
         addNoteButton.setOnClickListener { showAddNoteDialog() }
         addHabitButton.setOnClickListener { showAddHabitDialog() }
         settingsButton.setOnClickListener { showSettingsDialog() }
         addReminderButton.setOnClickListener { showAddReminderDialog() }
     }
 
-    private fun toggleReminderCompletion(position: Int) {
-        reminders[position].isCompleted = !reminders[position].isCompleted
-        saveReminders() // Сохраняем изменения
-        remindersAdapter.notifyItemChanged(position) // Обновляем адаптер
-    }
+
+    // Основные функции создания/удаления/обновления заметок, напоминаний и привычек
 
     private fun saveNotes() {
         val editor = sharedPreferences.edit()
@@ -242,7 +241,6 @@ class MainActivity : AppCompatActivity() {
             notes.addAll(savedNotes)
         }
     }
-
 
 
 
@@ -271,6 +269,7 @@ class MainActivity : AppCompatActivity() {
             habits.addAll(savedHabits)
         }
     }
+
 
 
     private fun saveReminders() {
@@ -331,7 +330,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     private fun updateRemindersView() {
         val showMoreButton = findViewById<Button>(R.id.showMoreRemindersButton)
         val currentVisibleReminders = reminders.take(visibleRemindersCount).toMutableList()
@@ -346,7 +344,6 @@ class MainActivity : AppCompatActivity() {
             showMoreButton.visibility = View.GONE
         }
     }
-
 
 
 
@@ -370,6 +367,7 @@ class MainActivity : AppCompatActivity() {
             .create()
             .show()
     }
+
 
     private fun showAddHabitDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_habit, null)
@@ -423,12 +421,6 @@ class MainActivity : AppCompatActivity() {
             .create()
             .show()
     }
-
-
-
-
-
-
 
 
 

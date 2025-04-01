@@ -14,11 +14,42 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Блок с календарем -->
+
+
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
-                android:layout_height="140dp"
-                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/zastavka" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp"
+                android:layout_margin="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Календарь"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <CalendarView
+                        android:id="@+id/calendarView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -52,38 +83,6 @@
                         android:backgroundTint="#FFAA00"
                         android:text="Новый совет"
                         android:textColor="@color/white" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Блок с календарем -->
-
-
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp"
-                android:layout_margin="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Календарь"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
-
-                    <CalendarView
-                        android:id="@+id/calendarView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
